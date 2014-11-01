@@ -66,7 +66,7 @@ func splitBoard(b Board, r *rand.Rand) (b1, b2 Board, didSplit bool) {
 	if b.Height < 2 || b.Width < 2 {
 		return
 	}
-	if b.Height > b.Width {
+	if b.Height > b.Width && r.Float32() > 0.3 {
 		b1, b2 = b.Hsplit(rUintn(r, 1, b.Height))
 		return b1, b2, true
 	} else {
