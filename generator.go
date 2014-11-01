@@ -14,7 +14,8 @@ type MeasuredBoards struct {
 func (mb *MeasuredBoards) Calc() {
 	var cumArea int
 	for i := 0; i < len(mb.Boards); i++ {
-		cumArea += int(max(mb.Boards[i].Width, mb.Boards[i].Height))
+		area := mb.Boards[i].Area()
+		cumArea += int(area * area)
 		mb.CumArea[i] = cumArea
 	}
 	mb.TotalArea = int(cumArea)
@@ -47,7 +48,7 @@ func splitBoard(b Board, r *rand.Rand) (b1, b2 Board, didSplit bool) {
 		return b1, b2, true
 	} else {
 		b1, b2 = b.Vsplit(rUintn(r, 1, b.Width))
-		return b1, b2, true		
+		return b1, b2, true
 	}
 }
 

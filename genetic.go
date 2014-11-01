@@ -11,7 +11,7 @@ type WeightedJoin struct {
 type Genotype []WeightedJoin
 
 func NewGenotype(n uint16) Genotype {
-	length := 4 * n * (n - 1)
+	length := n * (n - 1) / 2
 	return make([]WeightedJoin, length)
 }
 
@@ -20,14 +20,13 @@ func NewRandomGenotype(nboards uint16, r *rand.Rand) Genotype {
 	k := 0
 	for i := uint16(0); i < nboards; i++ {
 		for j := i + 1; j < nboards; j++ {
-			for config := uint8(0); config < 8; config++ {
-				wj := &c[k]
-				wj.i = i
-				wj.j = j
-				wj.config = Join(config)
-				wj.weight = r.Float32()
-				k++
-			}
+			config := r.Intn(8)
+			wj := &c[k]
+			wj.i = i
+			wj.j = j
+			wj.config = Join(config)
+			wj.weight = r.Float32()
+			k++
 		}
 	}
 	return c
@@ -65,6 +64,7 @@ func UniformCrossover(p1, p2 Genotype, r *rand.Rand) (c1, c2 Genotype) {
 	}
 	return
 }
+
 var _ Crossover = UniformCrossover
 
 func OnePointCrossover(p1, p2 Genotype, r *rand.Rand) (c1, c2 Genotype) {
@@ -77,6 +77,7 @@ func OnePointCrossover(p1, p2 Genotype, r *rand.Rand) (c1, c2 Genotype) {
 	copy(c2[cpoint:], p1[cpoint:])
 	return
 }
+
 var _ Crossover = OnePointCrossover
 
 func TwoPointCrossover(p1, p2 Genotype, r *rand.Rand) (c1, c2 Genotype) {
@@ -96,10 +97,11 @@ func TwoPointCrossover(p1, p2 Genotype, r *rand.Rand) (c1, c2 Genotype) {
 	copy(c2[point2:], p2[point2:])
 	return
 }
+
 var _ Crossover = TwoPointCrossover
 
-
 type Mutator func(Genotype, *rand.Rand)
+
 //In-place chromosome mutation, by replacing some of the
 //gene weights by a new random weight.
 //Given a chromosome, RandomNorm(p, sigma)
@@ -109,11 +111,11 @@ type Mutator func(Genotype, *rand.Rand)
 //for a mu value close to the chromosome length,
 //the actual number of mutated genes will be less.
 //Hopefully that's not an intended usecase.
-type NormalReplaceMutator struct {
+type NormalWeightMutator struct {
 	Mean, StdDev float64
 }
 
-func (p NormalReplaceMutator) Mutate(c Genotype, r *rand.Rand) {
+func (p NormalWeightMutator) Mutate(c Genotype, r *rand.Rand) {
 	take := uint16(r.NormFloat64()*p.StdDev + p.Mean)
 	for ; take > 0; take-- {
 		i := rand.Intn(len(c))
@@ -121,4 +123,28 @@ func (p NormalReplaceMutator) Mutate(c Genotype, r *rand.Rand) {
 	}
 }
 
-var _ Mutator = NormalReplaceMutator{}.Mutate
+type NormalConfigMutator struct {
+	Mean, StdDev float64
+}
+
+func (p NormalConfigMutator) Mutate(c Genotype, r *rand.Rand) {
+	take := uint16(r.NormFloat64()*p.StdDev + p.Mean)
+	for ; take > 0; take-- {
+		i := rand.Intn(len(c))
+		c[i].config = Join(rand.Intn(8))
+	}
+}
+
+type CompoundWeightConfigMutator struct {
+	Weight NormalWeightMutator
+	Config NormalConfigMutator
+}
+
+func (c CompoundWeightConfigMutator) Mutate(g Genotype, r *rand.Rand) {
+	c.Weight.Mutate(g, r)
+	c.Config.Mutate(g, r)
+}
+
+var _ Mutator = NormalWeightMutator{}.Mutate
+var _ Mutator = NormalConfigMutator{}.Mutate
+var _ Mutator = CompoundWeightConfigMutator{}.Mutate
