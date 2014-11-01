@@ -3,6 +3,7 @@ package guillotine
 import (
 	"math/rand"
 	"sort"
+	"math"
 )
 
 type MeasuredBoards struct {
@@ -21,11 +22,29 @@ func (mb *MeasuredBoards) Calc() {
 	mb.TotalArea = int(cumArea)
 }
 
-func NewRandomSpec(nboards, width, height int, r *rand.Rand) (spec *CutSpec) {
+func AreaDimensions(area float64, r *rand.Rand) (width, height uint){
+	mean := math.Sqrt(area)
+	stddev := mean/4
+	fwidth := (r.NormFloat64() * stddev + mean)
+	if fwidth > area/10{
+		fwidth = area/10
+	} else if fwidth < 10 {
+		fwidth = 10
+	}
+	return uint(fwidth), uint(area/fwidth)	
+}
+
+func MaxWidthDimensions(maxWidth int, r *rand.Rand) (width,height uint) {
+		width = uint(maxWidth)
+		height = uint(r.NormFloat64() * float64(maxWidth) + float64(4*maxWidth))	
+		return
+}
+
+func NewRandomSpec(nboards int, width, height uint, r *rand.Rand, limitWidth bool) (spec *CutSpec) {
 	boards := make([]Board, 0, nboards)
 	cumArea := make([]int, nboards)
 	mb := &MeasuredBoards{Boards: boards, CumArea: cumArea}
-	mb.Boards = append(mb.Boards, Board{Width: uint(width), Height: uint(height)})
+	mb.Boards = append(mb.Boards, Board{Width: width, Height: height})
 	for len(mb.Boards) < nboards {
 		mb.Calc()
 		target := r.Intn(mb.TotalArea)
@@ -36,7 +55,11 @@ func NewRandomSpec(nboards, width, height int, r *rand.Rand) (spec *CutSpec) {
 			mb.Boards = append(mb.Boards, b2)
 		}
 	}
-	return &CutSpec{Boards: mb.Boards}
+	spec = &CutSpec{Boards: mb.Boards}
+	if limitWidth{
+		spec.MaxWidth = width
+	}
+	return spec
 }
 
 func splitBoard(b Board, r *rand.Rand) (b1, b2 Board, didSplit bool) {

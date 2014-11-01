@@ -43,7 +43,8 @@ func (board Board) Area() uint {
 }
 
 type CutSpec struct {
-	Boards []Board
+	Boards   []Board
+	MaxWidth uint
 }
 
 func (spec *CutSpec) Add(width, height uint) *CutSpec {
@@ -51,6 +52,6 @@ func (spec *CutSpec) Add(width, height uint) *CutSpec {
 	return spec
 }
 
-func newCutSpec() *CutSpec {
-	return &CutSpec{make([]Board, 0, 10)}
+func newCutSpec(nboards uint, maxWidth uint) *CutSpec {
+	return &CutSpec{Boards: make([]Board, 0, nboards), MaxWidth: maxWidth}
 }

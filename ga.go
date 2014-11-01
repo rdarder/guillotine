@@ -8,18 +8,15 @@ import (
 
 var _ = fmt.Println
 
-func GetPhenotype(nboards uint16, genotype Genotype) *LayoutTree {
-	var  gcopy Genotype = make([]WeightedJoin, len(genotype))
-	copy(gcopy[:], genotype[:])
-	sort.Sort(gcopy)
-	genotype = gcopy
-//	sort.Sort(genotype)
-	lt := emptyLayoutTree(nboards)
-	for i := 0; nboards > 1; i++ {
+func GetPhenotype(spec *CutSpec, genotype Genotype) *LayoutTree {
+	genotype = genotype.copy()
+	sort.Sort(genotype)
+	lt := NewLayoutTree(spec)
+	remaining := len(spec.Boards)-1
+	for i := 0; remaining > 0; i++ {
 		wj := &genotype[i]
-		//		fmt.Printf("%v -> %v: (%v,%v)\n", i, nboards, wj.i, wj.j)
 		if lt.take(wj.i, wj.j, wj.config) {
-			nboards -= 1
+			remaining -= 1
 		}
 	}
 	return lt
@@ -170,8 +167,8 @@ func (ga GeneticAlgorithm) breed(p1, p2 Genotype) (c1, c2 Genotype) {
 func (ga GeneticAlgorithm) Evaluate(pop Population) (rp *RankedPopulation) {
 	fitness := make([]uint, len(pop))
 	for i, genotype := range pop {
-		phenotype := GetPhenotype(ga.TotalBoards, genotype)
-		fitness[i] = ga.Evaluator(phenotype, ga.Spec)
+		phenotype := GetPhenotype(ga.Spec, genotype)
+		fitness[i] = ga.Evaluator(phenotype)
 	}
 	rp = &RankedPopulation{pop, fitness}
 //	fmt.Println(rp.Fitnesses)

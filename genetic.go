@@ -10,6 +10,12 @@ type WeightedJoin struct {
 
 type Genotype []WeightedJoin
 
+func (g Genotype) copy() Genotype {
+	c := make([]WeightedJoin, len(g))
+	copy(c, g)
+	return c
+}
+
 func NewGenotype(n uint16) Genotype {
 	length := n * (n - 1) / 2
 	return make([]WeightedJoin, length)

@@ -89,13 +89,21 @@ type StackNode struct {
 type LayoutTree struct {
 	Picks    []PickLeaf  //size N for N boards
 	Stacks   []StackNode //size N-1 for N boards
-	nextNode uint16      //0-based node index
-	nboards  uint16
+	Nboards  uint16
+	Spec     *CutSpec
+	Areas    []Board
+	NextNode uint16
 }
 
-func emptyLayoutTree(n uint16) *LayoutTree {
+func NewLayoutTree(spec *CutSpec) *LayoutTree {
+	n := len(spec.Boards)
 	return &LayoutTree{
-		make([]PickLeaf, n, n), make([]StackNode, n-1, n-1), 0, n}
+		Spec:    spec,
+		Nboards: uint16(n),
+		Picks:   make([]PickLeaf, n, n),
+		Stacks:  make([]StackNode, n-1, n-1),
+		Areas:   make([]Board, n-1),
+	}
 }
 
 //Join two boards if they're not already connected together.
@@ -108,16 +116,32 @@ func emptyLayoutTree(n uint16) *LayoutTree {
 //horizontal. Rotation configuration is only considered if the board
 //to be joined hasn't been picked before. The first pick determines
 //rotation
-func (t *LayoutTree) take(i, j uint16, config Join) bool {
-	iRoot := t.getLeafRoot(i)
-	jRoot := t.getLeafRoot(j)
+func (lt *LayoutTree) take(i, j uint16, config Join) bool {
+	iRoot := lt.getLeafRoot(i)
+	jRoot := lt.getLeafRoot(j)
+	k := lt.NextNode
 	if iRoot == jRoot {
 		return false
 	} else {
-		t.setNode(t.nextNode, iRoot, jRoot, config)
-		t.nextNode += 1
+		lt.setNode(k, iRoot, jRoot, config)
+		lt.setChild(iRoot, k, config.irot())
+		lt.setChild(jRoot, k, config.jrot())
+		lt.areaStep(int(k), lt.Spec)
+		if lt.Spec.MaxWidth > 0 && config.direction() == HORIZONTAL &&
+			lt.Areas[k].Width > lt.Spec.MaxWidth {
+			lt.setNode(k, iRoot, jRoot, config.direct(VERTICAL))
+			lt.areaStep(int(k), lt.Spec)
+		}
+		lt.NextNode += 1
 		return true
 	}
+}
+
+func (t *LayoutTree) clearNode(i, left, right uint16) {
+	node := &t.Stacks[i]
+	node.Left = 0
+	node.Right = 0
+	//direction is a bool, no value for empty
 }
 
 func (t *LayoutTree) setNode(i, left, right uint16, config Join) {
@@ -125,44 +149,38 @@ func (t *LayoutTree) setNode(i, left, right uint16, config Join) {
 	node.Direction = config.direction()
 	node.Left = left
 	node.Right = right
-	t.setChild(left, i, config.irot())
-	t.setChild(right, i, config.jrot())
 }
 
 func (t *LayoutTree) setChild(i, parent uint16, rot bool) {
-	if i < t.nboards {
+	if i < t.Nboards {
 		t.Picks[i].Parent = parent + 1
 		t.Picks[i].Rot = rot
 	} else {
-		t.Stacks[i-t.nboards].Parent = parent + 1
+		t.Stacks[i-t.Nboards].Parent = parent + 1
 	}
-
 }
 
-type Fitness func(t *LayoutTree, spec *CutSpec) uint
+type Fitness func(t *LayoutTree) uint
 
-func (t *LayoutTree) areaWalk(spec *CutSpec) []Board {
-	state := make([]Board, len(spec.Boards)-1)
-	//state is an [n-1]Board for n boards
-	nboards := len(t.Picks)
-	if len(state) < nboards-1 {
-		panic("State too small")
+//Processes an area state from start to (non including) end.
+//Assumes state has already been computed from 0 to start-1
+func (t *LayoutTree) areaStep(i int, spec *CutSpec) {
+	stack := t.Stacks[i]
+	first := t.getBoard(stack.Left, spec.Boards, t.Areas)
+	second := t.getBoard(stack.Right, spec.Boards, t.Areas)
+	switch stack.Direction {
+	case VERTICAL:
+		t.Areas[i] = first.Vstack(second)
+	case HORIZONTAL:
+		t.Areas[i] = first.Hstack(second)
 	}
-	for i, stack := range t.Stacks {
-		first := t.getBoard(stack.Left, spec.Boards, state)
-		second := t.getBoard(stack.Right, spec.Boards, state)
-		switch stack.Direction {
-		case VERTICAL:
-			state[i] = first.Vstack(second)
-		case HORIZONTAL:
-			state[i] = first.Hstack(second)
-		}
-	}
-	return state
 }
 
-func (t *LayoutTree) Area(spec *CutSpec) uint {
-	return t.areaWalk(spec)[len(spec.Boards)-2].Area()
+//It'd be better to decouple area calculation from tree building
+//but wee somehow need to track if the layout falls outside the
+//spec limits (maxWidth)
+func (t *LayoutTree) Area() uint {
+	return t.Areas[len(t.Areas)-1].Area()
 }
 
 type Rect struct {
@@ -174,11 +192,17 @@ type Drawer struct {
 	spec  *CutSpec
 }
 
-func NewDrawer(lt *LayoutTree, spec *CutSpec) *Drawer{
-	return &Drawer{lt: lt, state: lt.areaWalk(spec), spec: spec}	
+type Drawing struct {
+	Boxes []Rect
+	Sheet Rect
 }
+
+func NewDrawer(lt *LayoutTree, spec *CutSpec) *Drawer {
+	return &Drawer{lt: lt, state: lt.Areas, spec: spec}
+}
+
 //needs cleanup
-func (d *Drawer) Draw() []Rect {
+func (d *Drawer) Draw() *Drawing {
 	nboards := len(d.spec.Boards)
 	boxes := make([]Rect, nboards)
 	for i, board := range d.spec.Boards {
@@ -189,7 +213,9 @@ func (d *Drawer) Draw() []Rect {
 		boxes[i].Height = board.Height
 	}
 	d.DrawWithOffset(2*nboards-2, Board{0, 0}, boxes)
-	return boxes
+	totalArea := d.lt.Areas[nboards-2]
+	sheet := Rect{0, 0, totalArea.Width, totalArea.Height}
+	return &Drawing{Boxes: boxes, Sheet: sheet}
 }
 
 //throw away and redo
@@ -214,14 +240,14 @@ func (d *Drawer) DrawWithOffset(i int, offset Board, boxes []Rect) {
 var _ Fitness = (*LayoutTree).Area
 
 func (t *LayoutTree) getBoard(i uint16, orig []Board, state []Board) Board {
-	if i < t.nboards {
+	if i < t.Nboards {
 		if t.Picks[i].Rot {
 			return orig[i].rotated()
 		} else {
 			return orig[i]
 		}
 	} else {
-		return state[i-t.nboards]
+		return state[i-t.Nboards]
 	}
 }
 
@@ -234,7 +260,7 @@ func (t *LayoutTree) getLeafRoot(i uint16) uint16 {
 		return i
 	} else {
 		pick.Parent = t.getNodeRoot(pick.Parent)
-		return pick.Parent + t.nboards - 1
+		return pick.Parent + t.Nboards - 1
 	}
 }
 

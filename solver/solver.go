@@ -22,8 +22,8 @@ func main() {
 	var population = flag.Int("population", 300, "Population size")
 	var tsize = flag.Int("tsize", 5, "Tournament size")
 	var eliteSize = flag.Int("eliteSize", 10, "Elite size")
-	var width = flag.Int("width", 800, "Target total width")
-	var height = flag.Int("height", 800, "Target total height")
+	var area = flag.Int("area", 2000, "Target total area")
+	var maxWidth = flag.Int("maxWidth", 0, "sheet max width")
 	var psel = flag.Float64("psel", 0.8, "Tournament selection probability")
 	var cx = flag.String("crossover", "uniform", "Crossover strategy")
 	var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
@@ -35,18 +35,6 @@ func main() {
 	var seed = flag.Int64("seed", time.Now().Unix(), "Random seed for repeatable runs")
 
 	flag.Parse()
-	var crossover guillotine.Crossover
-	switch *cx {
-	case "uniform":
-		crossover = guillotine.UniformCrossover
-	case "onepoint":
-		crossover = guillotine.OnePointCrossover
-	case "twopoint":
-		crossover = guillotine.TwoPointCrossover
-	default:
-		panic("Invalid option for crossover")
-
-	}
 
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
@@ -57,9 +45,32 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
+	var crossover guillotine.Crossover
+	switch *cx {
+	case "uniform":
+		crossover = guillotine.UniformCrossover
+	case "onepoint":
+		crossover = guillotine.OnePointCrossover
+	case "twopoint":
+		crossover = guillotine.TwoPointCrossover
+	default:
+		panic("Invalid option for crossover")
+	}
+
 	r := rand.New(rand.NewSource(*seed))
-	spec := guillotine.NewRandomSpec(*nboards, *width, *height, r)
-	target := *width * (*height)
+	var width, height uint
+	var limitWidth bool
+
+	if *maxWidth == 0 {
+		width, height = guillotine.AreaDimensions(float64(*area), r)
+		limitWidth = false
+	} else {
+		width, height = guillotine.MaxWidthDimensions(*maxWidth, r)
+		limitWidth = true
+	}
+	spec := guillotine.NewRandomSpec(*nboards, width, height, r, limitWidth)
+	target := width * height
+
 	ga := &guillotine.GeneticAlgorithm{
 		TotalBoards: uint16(*nboards),
 		Spec:        spec,
@@ -74,49 +85,25 @@ func main() {
 				StdDev: *configMutateMean / 5,
 			},
 		}.Mutate,
-		Breeder: crossover,
-		SelectorBuilder: guillotine.NewTournamentSelectorBuilder(
-			*tsize, float32(*psel), r, true),
-		R:         r,
-		EliteSize: *eliteSize}
-	//size int, p float32, r *rand.Rand, min bool)
-	pop := guillotine.NewRandomPopulation(uint16(*nboards), uint(*population), r)
-	var rankedPop *guillotine.RankedPopulation
-	//	fmt.Printf("Spec: %v\n", spec.Boards)
-	//	fmt.Printf("Target: %v\n", target)
-	for i := 0; i < *generations; i++ {
-		rankedPop = ga.Evaluate(pop)
-		pop = ga.Next(rankedPop)
+		Breeder:         crossover,
+		SelectorBuilder: guillotine.NewTournamentSelectorBuilder(*tsize, float32(*psel), r, true),
+		R:               r,
+		EliteSize:       *eliteSize,
 	}
-	bestLayout := guillotine.GetPhenotype(uint16(*nboards), rankedPop.Pop[0])
+	pop := guillotine.NewRandomPopulation(uint16(*nboards), uint(*population), r)
+	rankedPop := ga.Evaluate(pop)
+	for i := 1; i < *generations; i++ {
+		pop = ga.Next(rankedPop)
+		rankedPop = ga.Evaluate(pop)
+	}
 
+	bestLayout := guillotine.GetPhenotype(spec, rankedPop.Pop[0])
 	drawer := guillotine.NewDrawer(bestLayout, spec)
-	boxes := drawer.Draw()
-
-	b, err := json.Marshal(boxes)
+	b, err := json.Marshal(drawer.Draw())
 	if err != nil {
-		fmt.Println("error:", err)
+		log.Fatal("error:", err)
 	}
 	os.Stdout.Write(b)
-	best := int(rankedPop.Fitnesses[0])
-	fmt.Printf("%v%%\n", 100*best/target)
-
-	//fmt.Println("Layout:\n%v\n%v", bestLayout.Picks, bestLayout.Stacks)
-
-	//	bestLayout := guillotine.GetPhenotype(uint16(nboards), pop[0])
-	//	fmt.Printf("Layout:\n%v\n%v\n", bestLayout.Picks, bestLayout.Stacks)
-	//	fmt.Printf("Genotype:\n%v\n", pop[0])
-
-	/*
-			nboards         uint16
-		spec            *CutSpec
-		evaluator       Fitness
-		mutator         Mutator
-		breeder         Crossover
-		selectorBuilder SelectorBuilder
-		r               *rand.Rand
-		minFitness      bool
-
-	*/
-
+	best := rankedPop.Fitnesses[0]
+	fmt.Printf("\nWaste: %.2f%%\n", 100*(float32(best)/float32(target)-1))
 }
