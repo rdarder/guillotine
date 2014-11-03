@@ -22,7 +22,7 @@ type BoardOrder struct {
 	Amount uint  `json:"amount" endpoints:"req"`
 }
 type CutSpec struct {
-	Orders   []BoardOrder            `json:"boards" endpoints:"req"`
+	Orders   []BoardOrder            `json:"orders" endpoints:"req"`
 	MaxWidth uint                    `json:"maxWidth"`
 	Hints    *GeneticAlgorithmParams `json:"hints" endpoints:"req"`
 }
@@ -83,7 +83,7 @@ var defaultHints GeneticAlgorithmParams = GeneticAlgorithmParams{
 	TournamentSize:     8,
 	FittestProbability: 0.7,
 	Population:         50,
-	Generations:        100,
+	Generations:        200,
 	EliteSize:          5,
 }
 
@@ -167,11 +167,12 @@ func CutSpecFromMessage(message *CutSpec) (*guillotine.CutSpec, error) {
 			return nil, fmt.Errorf("Invalid amount on order <%d>", i)
 		} else {
 			//this check should go in spec.Add()
-			if !spec.Fits(order.Board.Width, order.Board.Height) {
-				return nil, fmt.Errorf("Board larger than MaxWidth")
+			width, height := order.Board.Width, order.Board.Height
+			if !spec.Fits(width, height) {
+				return nil, fmt.Errorf("Invalid board dimensions: (%v, %v)", width, height)
 			}
 			for i := uint(0); i < order.Amount; i++ {
-				spec.Add(order.Board.Width, order.Board.Height)
+				spec.Add(width, height)
 			}
 		}
 	}
@@ -188,7 +189,7 @@ func GetPlacements(lt *guillotine.LayoutTree) (sheet Board, bps []BoardPlacement
 		bp.Oriented = Board{drawing.Boxes[i].Width, drawing.Boxes[i].Height}
 		bp.Placement.Rotated = lt.Picks[i].Rot
 		bp.Placement.X = drawing.Boxes[i].X
-		bp.Placement.X = drawing.Boxes[i].Y
+		bp.Placement.Y = drawing.Boxes[i].Y
 	}
 	sheet = Board{drawing.Sheet.Width, drawing.Sheet.Height}
 	return sheet, bps
@@ -218,16 +219,21 @@ func (gn *Guillotine) Cut(r *http.Request, msg *CutSpec, resp *CutResults) error
 func (gn *Guillotine) RandomSpec(r *http.Request, p *endpoints.VoidMessage, spec *CutSpec) error{
 
 	spec.MaxWidth = NormUint(200, 40, gn.r)
-	for i := NormUint(6, 3, gn.r); i > 0; i-- {
+	for i := NormUint(5, 3, gn.r) + 1; i > 0; i-- {
 		order := BoardOrder{
 			Amount: NormUint(1, 0.5, gn.r) + 1,
 			Board: Board{
-				Width:  NormUint(80, 40, gn.r) % 200, // at least one dimension below maxWidth
+				// at least one dimension below maxWidth
+				Width:  NormUint(80, 40, gn.r) % spec.MaxWidth, 
 				Height: NormUint(100, 30, gn.r),
 			},
 		}
 		spec.Orders = append(spec.Orders, order)
 	}
+	return nil
+}
+func (gn *Guillotine) DefaultHints(r *http.Request, p *endpoints.VoidMessage, hints *GeneticAlgorithmParams) error {
+	*hints = defaultHints;
 	return nil
 }
 
@@ -242,9 +248,12 @@ func init() {
 	}
 	info := api.MethodByName("Cut").Info()
 	info.Name, info.HTTPMethod, info.Path, info.Desc =
-		"guillotine.cut", "POST", "guillotine", "Get a guillotine cut for the given boards."
+		"guillotine.cut", "POST", "cut", "Get a guillotine cut for the given boards."
 	info = api.MethodByName("RandomSpec").Info()
 	info.Name, info.HTTPMethod, info.Path, info.Desc =
-		"guillotine.randomSpec", "GET", "guillotine", "Generate a random cut spec."
+		"guillotine.randomSpec", "GET", "randomSpec", "Generate a random cut spec."
+	info = api.MethodByName("DefaultHints").Info()
+	info.Name, info.HTTPMethod, info.Path, info.Desc =
+		"guillotine.defaultHints", "GET", "defaultHints", "Get the default hints."
 	endpoints.HandleHTTP()
 }

@@ -72,7 +72,6 @@ func main() {
 	target := width * height
 
 	ga := &guillotine.GeneticAlgorithm{
-		TotalBoards: uint16(*nboards),
 		Spec:        spec,
 		Evaluator:   (*guillotine.LayoutTree).Area,
 		Mutator: guillotine.CompoundWeightConfigMutator{
@@ -88,7 +87,7 @@ func main() {
 		Breeder:         crossover,
 		SelectorBuilder: guillotine.NewTournamentSelectorBuilder(*tsize, float32(*psel), r, true),
 		R:               r,
-		EliteSize:       *eliteSize,
+		EliteSize:       uint(*eliteSize),
 	}
 	pop := guillotine.NewRandomPopulation(uint16(*nboards), uint(*population), r)
 	rankedPop := ga.Evaluate(pop)
@@ -98,7 +97,7 @@ func main() {
 	}
 
 	bestLayout := guillotine.GetPhenotype(spec, rankedPop.Pop[0])
-	drawer := guillotine.NewDrawer(bestLayout, spec)
+	drawer := guillotine.NewDrawer(bestLayout)
 	b, err := json.Marshal(drawer.Draw())
 	if err != nil {
 		log.Fatal("error:", err)

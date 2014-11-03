@@ -183,13 +183,20 @@ func (t *LayoutTree) Area() uint {
 	return t.Areas[len(t.Areas)-1].Area()
 }
 
+func (t *LayoutTree) Height() uint {
+	return t.Areas[len(t.Areas)-1].Height
+}
+
+var _ Fitness = (*LayoutTree).Area
+var _ Fitness = (*LayoutTree).Height
+
+
 type Rect struct {
 	X, Y, Width, Height uint
 }
 type Drawer struct {
 	lt    *LayoutTree
 	state []Board
-	spec  *CutSpec
 }
 
 type Drawing struct {
@@ -197,15 +204,15 @@ type Drawing struct {
 	Sheet Rect
 }
 
-func NewDrawer(lt *LayoutTree, spec *CutSpec) *Drawer {
-	return &Drawer{lt: lt, state: lt.Areas, spec: spec}
+func NewDrawer(lt *LayoutTree) *Drawer {
+	return &Drawer{lt: lt, state: lt.Areas}
 }
 
 //needs cleanup
 func (d *Drawer) Draw() *Drawing {
-	nboards := len(d.spec.Boards)
+	nboards := len(d.lt.Spec.Boards)
 	boxes := make([]Rect, nboards)
-	for i, board := range d.spec.Boards {
+	for i, board := range d.lt.Spec.Boards {
 		if d.lt.Picks[i].Rot {
 			board = board.rotated()
 		}
@@ -220,14 +227,14 @@ func (d *Drawer) Draw() *Drawing {
 
 //throw away and redo
 func (d *Drawer) DrawWithOffset(i int, offset Board, boxes []Rect) {
-	nboards := len(d.spec.Boards)
+	nboards := len(d.lt.Spec.Boards)
 	if i < nboards {
 		boxes[i].X = offset.Width
 		boxes[i].Y = offset.Height
 	} else {
 		stack := d.lt.Stacks[i-nboards]
 		d.DrawWithOffset(int(stack.Left), offset, boxes)
-		leftOffset := d.lt.getBoard(stack.Left, d.spec.Boards, d.state)
+		leftOffset := d.lt.getBoard(stack.Left, d.lt.Spec.Boards, d.state)
 		if stack.Direction == VERTICAL {
 			offset = Board{offset.Width, offset.Height + leftOffset.Height}
 		} else {
@@ -237,7 +244,6 @@ func (d *Drawer) DrawWithOffset(i int, offset Board, boxes []Rect) {
 	}
 }
 
-var _ Fitness = (*LayoutTree).Area
 
 func (t *LayoutTree) getBoard(i uint16, orig []Board, state []Board) Board {
 	if i < t.Nboards {

@@ -43,12 +43,19 @@ func (board Board) Area() uint {
 }
 
 type CutSpec struct {
-	Boards   []Board
-	MaxWidth uint
+	Boards    []Board
+	MaxWidth  uint
+	TotalArea uint
+}
+
+func (spec *CutSpec) Fits(width, height uint) bool {
+	return width > 0 && height > 0 && (spec.MaxWidth == 0 ||
+		width <= spec.MaxWidth || height <= spec.MaxWidth)
 }
 
 func (spec *CutSpec) Add(width, height uint) *CutSpec {
 	spec.Boards = append(spec.Boards, Board{width, height})
+	spec.TotalArea += width * height
 	return spec
 }
 

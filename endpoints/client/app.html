@@ -1,0 +1,156 @@
+<div ng-controller="main">
+	<div class="row">
+		<div class="col-sm-6" config-editor spec="spec" hints="hints">
+			<div class="col-xs-8"></div>
+			<div class="col-xs-4">
+				<button class="btn btn-primary" ng-click="run()">Run</button>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div results-page results="results" style="text-align:center"></div>
+		</div>
+	</div>
+</div>
+</div>
+
+<script type="text/ng-template" id="resultsPage.html">
+</script>
+
+<script type="text/ng-template" id="configEditor.html">
+<div class="row">
+	<ul class="nav nav-tabs nav-justified" role="tablist">
+		<li role="presentation" ng-class="{active:tab=='spec'}"><a
+			href="#" ng-click="tab='spec'">Cut Specs</a></li>
+		<li role="presentation" ng-class="{active:tab=='hints'}"><a
+			href="#" ng-click="tab='hints'">Config</a></li>
+	</ul>
+	<div class="tab-content">
+		<div role="tabpanel" class="tab-pane" ng-class="{active:tab=='spec'}">
+			<div spec-editor spec="spec" style="padding-top: 10px"></div>
+		</div>
+		<div role="tabpanel" class="tab-pane" ng-class="{active:tab=='hints'}">
+			<div hints-editor hints="hints" style="margin-top: 10px"></div>
+		</div>
+	</div>
+</div>
+<div class="row" ng-transclude></div>
+</script>
+
+<script type="text/ng-template" id="hintsEditor.html">
+<div class="row">
+	<form class="form-horizontal" role="form">
+		<div class="form-group">
+			<label class="col-sm-6 control-label">Population Size</label>
+			<div class="col-sm-6">
+				<input type="number" class="form-control"
+					ng-model="hints.Population">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-6 control-label">Number of Generations</label>
+			<div class="col-sm-6">
+				<input type="number" class="form-control"
+					ng-model="hints.Generations">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-6 control-label">Crossover</label>
+			<div class="col-sm-6">
+				<select ng-model="hints.Crossover" class="form-control">
+					<option>twopoint</option>
+					<option>onepoint</option>
+					<option>uniform</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-6 control-label">Elite Size</label>
+			<div class="col-sm-6">
+				<input type="number" class="form-control"
+					ng-model="hints.EliteSize">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-6 control-label">Tournament Size</label>
+			<div class="col-sm-6">
+				<input type="number" class="form-control"
+					ng-model="hints.TournamentSize">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-6 control-label">Fittest Selection Probability</label>
+			<div class="col-sm-6">
+				<input type="number" class="form-control"
+					ng-model="hints.FittestProbability">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-6 control-label">Weight Mutations Mean</label>
+			<div class="col-sm-6">
+				<input type="number" class="form-control"
+					ng-model="hints.WeightMutateMean">
+			</div>
+		</div>
+		<div class="form-group">
+			<label class="col-sm-6 control-label">Config Mutations Mean</label>
+			<div class="col-sm-6">
+				<input type="number" class="form-control"
+					ng-model="hints.ConfigMutateMean">
+			</div>
+		</div>
+	</form>
+
+</div>
+</script>
+
+<script type="text/ng-template" id="specEditor.html">
+<div class="row">
+	<label class="col-xs-8"> <input type="checkbox"
+		ng-model="spec.limitedWidth"> Source Sheet has limited width.
+	</label>
+	<div class="col-xs-4">
+		<input class="form-control" type="number" min="0"
+			ng-disabled="!spec.limitedWidth" placeholder="Max Width"
+			ng-model="spec.maxWidth">
+	</div>
+</div>
+<div board-orders orders="spec.orders"></div>
+</script>
+
+<script type="text/ng-template" id="boardOrders.html">
+<form>
+	<div class="row">
+		<label class="col-xs-3">Qty</label> <label class="col-xs-4">Width</label>
+		<label class="col-xs-4">Height</label>
+		<div class="col-xs-1"></div>
+	</div>
+	<div class="row" ng-repeat="order in orders">
+		<div board-order order="order">
+			<button ng-click="remove($index)" type="button"
+				class="btn btn-default">
+				<span class="glyphicon glyphicon-remove"> </span>
+			</button>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-4">
+			<button class="btn btn-default" ng-click="add()">
+				Add <span class="glyphicon glyphicon-plus"> </span>
+			</button>
+		</div>
+	</div>
+</form>
+</script>
+
+<script type="text/ng-template" id="boardOrder.html">
+<div class="col-xs-3">
+<input class="col-xs-1 form-control" type="number" name="amount" min="1" required ng-model="order.amount">
+</div>
+<div class="col-xs-3">
+<input class="col-xs-1 form-control" type="number" name="width" min="1" required ng-model="order.board.width">
+</div>
+<div class="col-xs-3">
+<input class="col-xs-1 form-control" type="number" name="height" min="1" required ng-model="order.board.height">
+</div>
+<div class="col-xs-3 ng-transclude"></div>
+</script>

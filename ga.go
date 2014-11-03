@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"time"
 )
 
 var _ = fmt.Println
@@ -12,7 +13,7 @@ func GetPhenotype(spec *CutSpec, genotype Genotype) *LayoutTree {
 	genotype = genotype.copy()
 	sort.Sort(genotype)
 	lt := NewLayoutTree(spec)
-	remaining := len(spec.Boards)-1
+	remaining := len(spec.Boards) - 1
 	for i := 0; remaining > 0; i++ {
 		wj := &genotype[i]
 		if lt.take(wj.i, wj.j, wj.config) {
@@ -147,14 +148,15 @@ func (pop Population) checkEvenSize() {
 }
 
 type GeneticAlgorithm struct {
-	TotalBoards     uint16
 	Spec            *CutSpec
 	Evaluator       Fitness
 	Mutator         Mutator
 	Breeder         Crossover
 	SelectorBuilder SelectorBuilder
 	R               *rand.Rand
-	EliteSize       int
+	EliteSize       uint
+	PopulationSize  uint
+	Generations     uint
 }
 
 func (ga GeneticAlgorithm) breed(p1, p2 Genotype) (c1, c2 Genotype) {
@@ -164,32 +166,58 @@ func (ga GeneticAlgorithm) breed(p1, p2 Genotype) (c1, c2 Genotype) {
 	return c1, c2
 }
 
-func (ga GeneticAlgorithm) Evaluate(pop Population) (rp *RankedPopulation) {
+func (ga *GeneticAlgorithm) Evaluate(pop Population) (rp *RankedPopulation) {
 	fitness := make([]uint, len(pop))
 	for i, genotype := range pop {
 		phenotype := GetPhenotype(ga.Spec, genotype)
 		fitness[i] = ga.Evaluator(phenotype)
 	}
 	rp = &RankedPopulation{pop, fitness}
-//	fmt.Println(rp.Fitnesses)
+	//	fmt.Println(rp.Fitnesses)
 	sort.Sort(rp)
-//	fmt.Println(rp.Fitnesses)
+	//	fmt.Println(rp.Fitnesses)
 	return rp
 }
 
-func (ga GeneticAlgorithm) Next(rp *RankedPopulation) Population {
+func (ga *GeneticAlgorithm) Next(rp *RankedPopulation) Population {
 	selector := ga.SelectorBuilder(rp)
-	psize := len(rp.Pop)
+	psize := uint(len(rp.Pop))
 	pepsi := make([]Genotype, psize)
 	copy(pepsi[:ga.EliteSize], rp.Pop[:ga.EliteSize])
 	for i := ga.EliteSize; i < psize; i++ {
 		p1, p2 := selector.next(), selector.next()
 		c1, c2 := ga.breed(p1, p2)
 		pepsi[i] = c1
-		if i < psize - 1 {
+		if i < psize-1 {
 			i++
 			pepsi[i] = c2
 		}
 	}
 	return pepsi
+}
+
+func (ga *GeneticAlgorithm) Run() *LayoutTree {
+	pop := NewRandomPopulation(uint16(len(ga.Spec.Boards)), ga.PopulationSize, ga.R)
+	rankedPop := ga.Evaluate(pop)
+	for i := uint(1); i < ga.Generations; i++ {
+		pop = ga.Next(rankedPop)
+		rankedPop = ga.Evaluate(pop)
+	}
+	return GetPhenotype(ga.Spec, rankedPop.Pop[0])
+}
+
+func (ga *GeneticAlgorithm) TimeBoundedRun(limit time.Duration) (gn uint, lt *LayoutTree) {
+	start := time.Now()
+	pop := NewRandomPopulation(uint16(len(ga.Spec.Boards)), ga.PopulationSize, ga.R)
+	rankedPop := ga.Evaluate(pop)
+	for i := uint(1); i < ga.Generations; i++ {
+		ng := int64(i)
+		if (time.Since(start).Nanoseconds()*(ng+1))/ng > limit.Nanoseconds() {
+			return i, GetPhenotype(ga.Spec, rankedPop.Pop[0])
+		} else {
+			pop = ga.Next(rankedPop)
+			rankedPop = ga.Evaluate(pop)
+		}
+	}
+	return ga.Generations, GetPhenotype(ga.Spec, rankedPop.Pop[0])
 }
