@@ -327,7 +327,7 @@
     "Crossover": "twopoint",
     "EliteSize": 5,
     "FittestProbability": 0.7,
-    "Generations": 1000,
+    "Generations": 200,
     "Population": 50,
     "TournamentSize": 8,
     "WeightMutateMean": 5
