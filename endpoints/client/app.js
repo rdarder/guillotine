@@ -96,12 +96,16 @@
 		scope.loadSample();
 	} ]);
 
-	app.directive("resultsPage", function($window) {
+	app.directive('resultsPage', function(){
 		return {
-			templateUrl : "resultsPage.html",
-			scope : {
-				results : '=',
-			},
+			templateUrl: 'resultsPage.html',
+			scope: {
+				results: '=',
+			}
+		}
+	})
+	app.directive("layoutDisplay", function($window) {
+		return {
 			link : function(scope, element, attrs) {
 				var toAppend = angular.element("<canvas></canvas>")
 				element.append(toAppend);

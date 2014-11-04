@@ -30,12 +30,22 @@
 			</div>
 		</div>
 		<div class="col-sm-6">
-			<div results-page results="results" style="text-align: center"></div>
+			<div results-page results="results"></div>
 		</div>
 	</div>
 </div>
 
 <script type="text/ng-template" id="resultsPage.html">
+	<div class="row">
+		<div class="col-xs-8" style="text-align:center" layout-display></div>
+		<div class="col-xs-4" ng-show="results" style="text-align:right">
+			<h3>Results</h3>
+			<p><span class="badge">{{results.sheet.width}}x{{results.sheet.height}}</span> Size</p>
+			<p><span class="badge">{{results.wastePercent|number:2}}%</span> Waste</p>
+			<p><span class="badge">{{results.boardPlacements.length}}</span> boards</p>
+			<p><span class="badge">{{results.runDetails.Generations}}</span> Generations</p>
+		</div>
+	</div>
 </script>
 
 <script type="text/ng-template" id="configEditor.html">
