@@ -1,0 +1,320 @@
+{
+  "results": {
+    "boardPlacements": [
+      {
+        "Orig": {
+          "height": 161,
+          "width": 93
+        },
+        "board": {
+          "height": 161,
+          "width": 93
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "Orig": {
+          "height": 161,
+          "width": 93
+        },
+        "board": {
+          "height": 161,
+          "width": 93
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 419
+        }
+      },
+      {
+        "Orig": {
+          "height": 50,
+          "width": 67
+        },
+        "board": {
+          "height": 67,
+          "width": 50
+        },
+        "placement": {
+          "rotated": true,
+          "x": 0,
+          "y": 338
+        }
+      },
+      {
+        "Orig": {
+          "height": 124,
+          "width": 128
+        },
+        "board": {
+          "height": 124,
+          "width": 128
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 161
+        }
+      },
+      {
+        "Orig": {
+          "height": 124,
+          "width": 128
+        },
+        "board": {
+          "height": 128,
+          "width": 124
+        },
+        "placement": {
+          "rotated": true,
+          "x": 0,
+          "y": 580
+        }
+      },
+      {
+        "Orig": {
+          "height": 71,
+          "width": 155
+        },
+        "board": {
+          "height": 155,
+          "width": 71
+        },
+        "placement": {
+          "rotated": true,
+          "x": 93,
+          "y": 0
+        }
+      },
+      {
+        "Orig": {
+          "height": 82,
+          "width": 112
+        },
+        "board": {
+          "height": 112,
+          "width": 82
+        },
+        "placement": {
+          "rotated": true,
+          "x": 93,
+          "y": 419
+        }
+      },
+      {
+        "Orig": {
+          "height": 82,
+          "width": 112
+        },
+        "board": {
+          "height": 112,
+          "width": 82
+        },
+        "placement": {
+          "rotated": true,
+          "x": 0,
+          "y": 769
+        }
+      },
+      {
+        "Orig": {
+          "height": 130,
+          "width": 53
+        },
+        "board": {
+          "height": 53,
+          "width": 130
+        },
+        "placement": {
+          "rotated": true,
+          "x": 0,
+          "y": 285
+        }
+      },
+      {
+        "Orig": {
+          "height": 130,
+          "width": 53
+        },
+        "board": {
+          "height": 130,
+          "width": 53
+        },
+        "placement": {
+          "rotated": false,
+          "x": 130,
+          "y": 161
+        }
+      },
+      {
+        "Orig": {
+          "height": 152,
+          "width": 61
+        },
+        "board": {
+          "height": 61,
+          "width": 152
+        },
+        "placement": {
+          "rotated": true,
+          "x": 0,
+          "y": 891
+        }
+      },
+      {
+        "Orig": {
+          "height": 152,
+          "width": 61
+        },
+        "board": {
+          "height": 61,
+          "width": 152
+        },
+        "placement": {
+          "rotated": true,
+          "x": 0,
+          "y": 708
+        }
+      },
+      {
+        "Orig": {
+          "height": 128,
+          "width": 56
+        },
+        "board": {
+          "height": 128,
+          "width": 56
+        },
+        "placement": {
+          "rotated": false,
+          "x": 124,
+          "y": 580
+        }
+      },
+      {
+        "Orig": {
+          "height": 122,
+          "width": 81
+        },
+        "board": {
+          "height": 122,
+          "width": 81
+        },
+        "placement": {
+          "rotated": false,
+          "x": 82,
+          "y": 769
+        }
+      },
+      {
+        "Orig": {
+          "height": 122,
+          "width": 81
+        },
+        "board": {
+          "height": 81,
+          "width": 122
+        },
+        "placement": {
+          "rotated": true,
+          "x": 50,
+          "y": 338
+        }
+      }
+    ],
+    "runDetails": {
+      "Generations": 200
+    },
+    "sheet": {
+      "height": 952,
+      "width": 184
+    },
+    "waste": 21499,
+    "wastePercent": 13.990460014706935
+  },
+  "spec": {
+    "hints": null,
+    "maxWidth": 184,
+    "orders": [
+      {
+        "amount": 2,
+        "board": {
+          "height": 161,
+          "width": 93
+        }
+      },
+      {
+        "amount": 1,
+        "board": {
+          "height": 50,
+          "width": 67
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 124,
+          "width": 128
+        }
+      },
+      {
+        "amount": 1,
+        "board": {
+          "height": 71,
+          "width": 155
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 82,
+          "width": 112
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 130,
+          "width": 53
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 152,
+          "width": 61
+        }
+      },
+      {
+        "amount": 1,
+        "board": {
+          "height": 128,
+          "width": 56
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 122,
+          "width": 81
+        }
+      }
+    ],
+    "limitedWidth": true
+  },
+  "hints": {
+    "ConfigMutateMean": 5,
+    "Crossover": "twopoint",
+    "EliteSize": 5,
+    "FittestProbability": 0.7,
+    "Generations": 200,
+    "Population": 50,
+    "TournamentSize": 8,
+    "WeightMutateMean": 5
+  }
+}

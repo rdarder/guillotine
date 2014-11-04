@@ -1,0 +1,335 @@
+{
+  "results": {
+    "boardPlacements": [
+      {
+        "Orig": {
+          "height": 70,
+          "width": 170
+        },
+        "board": {
+          "height": 70,
+          "width": 170
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "Orig": {
+          "height": 70,
+          "width": 170
+        },
+        "board": {
+          "height": 70,
+          "width": 170
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 70
+        }
+      },
+      {
+        "Orig": {
+          "height": 105,
+          "width": 122
+        },
+        "board": {
+          "height": 105,
+          "width": 122
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 237
+        }
+      },
+      {
+        "Orig": {
+          "height": 105,
+          "width": 122
+        },
+        "board": {
+          "height": 122,
+          "width": 105
+        },
+        "placement": {
+          "rotated": true,
+          "x": 0,
+          "y": 342
+        }
+      },
+      {
+        "Orig": {
+          "height": 34,
+          "width": 87
+        },
+        "board": {
+          "height": 34,
+          "width": 87
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 140
+        }
+      },
+      {
+        "Orig": {
+          "height": 103,
+          "width": 63
+        },
+        "board": {
+          "height": 63,
+          "width": 103
+        },
+        "placement": {
+          "rotated": true,
+          "x": 0,
+          "y": 174
+        }
+      },
+      {
+        "Orig": {
+          "height": 103,
+          "width": 63
+        },
+        "board": {
+          "height": 103,
+          "width": 63
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 534
+        }
+      },
+      {
+        "Orig": {
+          "height": 95,
+          "width": 20
+        },
+        "board": {
+          "height": 95,
+          "width": 20
+        },
+        "placement": {
+          "rotated": false,
+          "x": 170,
+          "y": 0
+        }
+      },
+      {
+        "Orig": {
+          "height": 91,
+          "width": 96
+        },
+        "board": {
+          "height": 96,
+          "width": 91
+        },
+        "placement": {
+          "rotated": true,
+          "x": 103,
+          "y": 140
+        }
+      },
+      {
+        "Orig": {
+          "height": 91,
+          "width": 96
+        },
+        "board": {
+          "height": 91,
+          "width": 96
+        },
+        "placement": {
+          "rotated": false,
+          "x": 113,
+          "y": 342
+        }
+      },
+      {
+        "Orig": {
+          "height": 104,
+          "width": 34
+        },
+        "board": {
+          "height": 34,
+          "width": 104
+        },
+        "placement": {
+          "rotated": true,
+          "x": 97,
+          "y": 534
+        }
+      },
+      {
+        "Orig": {
+          "height": 104,
+          "width": 34
+        },
+        "board": {
+          "height": 104,
+          "width": 34
+        },
+        "placement": {
+          "rotated": false,
+          "x": 63,
+          "y": 534
+        }
+      },
+      {
+        "Orig": {
+          "height": 70,
+          "width": 113
+        },
+        "board": {
+          "height": 70,
+          "width": 113
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 464
+        }
+      },
+      {
+        "Orig": {
+          "height": 70,
+          "width": 113
+        },
+        "board": {
+          "height": 70,
+          "width": 113
+        },
+        "placement": {
+          "rotated": false,
+          "x": 97,
+          "y": 568
+        }
+      },
+      {
+        "Orig": {
+          "height": 101,
+          "width": 88
+        },
+        "board": {
+          "height": 101,
+          "width": 88
+        },
+        "placement": {
+          "rotated": false,
+          "x": 122,
+          "y": 237
+        }
+      },
+      {
+        "Orig": {
+          "height": 101,
+          "width": 88
+        },
+        "board": {
+          "height": 101,
+          "width": 88
+        },
+        "placement": {
+          "rotated": false,
+          "x": 113,
+          "y": 433
+        }
+      }
+    ],
+    "runDetails": {
+      "Generations": 1000
+    },
+    "sheet": {
+      "height": 638,
+      "width": 212
+    },
+    "waste": 9860,
+    "wastePercent": 7.86308973172988
+  },
+  "spec": {
+    "hints": null,
+    "maxWidth": 212,
+    "orders": [
+      {
+        "amount": 2,
+        "board": {
+          "height": 70,
+          "width": 170
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 105,
+          "width": 122
+        }
+      },
+      {
+        "amount": 1,
+        "board": {
+          "height": 34,
+          "width": 87
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 103,
+          "width": 63
+        }
+      },
+      {
+        "amount": 1,
+        "board": {
+          "height": 95,
+          "width": 20
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 91,
+          "width": 96
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 104,
+          "width": 34
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 70,
+          "width": 113
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 101,
+          "width": 88
+        }
+      }
+    ],
+    "limitedWidth": true
+  },
+  "hints": {
+    "ConfigMutateMean": 5,
+    "Crossover": "twopoint",
+    "EliteSize": 5,
+    "FittestProbability": 0.7,
+    "Generations": 1000,
+    "Population": 50,
+    "TournamentSize": 8,
+    "WeightMutateMean": 5
+  }
+}

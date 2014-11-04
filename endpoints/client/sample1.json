@@ -1,0 +1,172 @@
+{
+  "results": {
+    "boardPlacements": [
+      {
+        "Orig": {
+          "height": 140,
+          "width": 69
+        },
+        "board": {
+          "height": 140,
+          "width": 69
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 116
+        }
+      },
+      {
+        "Orig": {
+          "height": 84,
+          "width": 37
+        },
+        "board": {
+          "height": 84,
+          "width": 37
+        },
+        "placement": {
+          "rotated": false,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "Orig": {
+          "height": 116,
+          "width": 62
+        },
+        "board": {
+          "height": 116,
+          "width": 62
+        },
+        "placement": {
+          "rotated": false,
+          "x": 37,
+          "y": 0
+        }
+      },
+      {
+        "Orig": {
+          "height": 116,
+          "width": 62
+        },
+        "board": {
+          "height": 62,
+          "width": 116
+        },
+        "placement": {
+          "rotated": true,
+          "x": 99,
+          "y": 0
+        }
+      },
+      {
+        "Orig": {
+          "height": 117,
+          "width": 53
+        },
+        "board": {
+          "height": 53,
+          "width": 117
+        },
+        "placement": {
+          "rotated": true,
+          "x": 99,
+          "y": 62
+        }
+      },
+      {
+        "Orig": {
+          "height": 117,
+          "width": 53
+        },
+        "board": {
+          "height": 117,
+          "width": 53
+        },
+        "placement": {
+          "rotated": false,
+          "x": 69,
+          "y": 116
+        }
+      },
+      {
+        "Orig": {
+          "height": 109,
+          "width": 90
+        },
+        "board": {
+          "height": 109,
+          "width": 90
+        },
+        "placement": {
+          "rotated": false,
+          "x": 122,
+          "y": 116
+        }
+      }
+    ],
+    "runDetails": {
+      "Generations": 1000
+    },
+    "sheet": {
+      "height": 256,
+      "width": 217
+    },
+    "waste": 6188,
+    "wastePercent": 12.535450935904707
+  },
+  "spec": {
+    "hints": null,
+    "maxWidth": 217,
+    "orders": [
+      {
+        "amount": 1,
+        "board": {
+          "height": 140,
+          "width": 69
+        }
+      },
+      {
+        "amount": 1,
+        "board": {
+          "height": 84,
+          "width": 37
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 116,
+          "width": 62
+        }
+      },
+      {
+        "amount": 2,
+        "board": {
+          "height": 117,
+          "width": 53
+        }
+      },
+      {
+        "amount": 1,
+        "board": {
+          "height": 109,
+          "width": 90
+        }
+      }
+    ],
+    "limitedWidth": true
+  },
+  "hints": {
+    "ConfigMutateMean": 5,
+    "Crossover": "twopoint",
+    "EliteSize": 5,
+    "FittestProbability": 0.7,
+    "Generations": 1000,
+    "Population": 50,
+    "TournamentSize": 8,
+    "WeightMutateMean": 5
+  }
+}
