@@ -119,6 +119,7 @@ func NewLayoutTree(spec *CutSpec) *LayoutTree {
 func (lt *LayoutTree) take(i, j uint16, config Join) bool {
 	iRoot := lt.getLeafRoot(i)
 	jRoot := lt.getLeafRoot(j)
+	config = lt.fixRotationConfig(i,j, config)
 	k := lt.NextNode
 	if iRoot == jRoot {
 		return false
@@ -159,6 +160,35 @@ func (t *LayoutTree) setChild(i, parent uint16, rot bool) {
 		t.Stacks[i-t.Nboards].Parent = parent + 1
 	}
 }
+
+//needs refactor, maxWidth edge cases didn't fit well in the original design. 
+func (lt *LayoutTree) rotationOnMaxWidth(i uint16, rot bool) (fixed bool){
+	if i > lt.Nboards || lt.Spec.MaxWidth == 0 {
+		return rot
+	}
+	leaf := lt.Spec.Boards[i]
+	if rot{
+		leaf = leaf.rotated()
+	}
+	if leaf.Width > lt.Spec.MaxWidth {
+		return !rot
+	} else{ 
+		return rot
+	}	
+}
+
+func (lt *LayoutTree) fixRotationConfig(i, j uint16, config Join) Join {
+	fixed := JOIN.direct(config.direction())
+	if lt.rotationOnMaxWidth(i, config.irot()){
+		fixed = fixed.irotated()		
+	}
+	if lt.rotationOnMaxWidth(j, config.jrot()){
+		fixed = fixed.jrotated()		
+	}
+	return fixed
+}
+
+
 
 type Fitness func(t *LayoutTree) uint
 

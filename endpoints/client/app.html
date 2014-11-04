@@ -1,16 +1,38 @@
 <div ng-controller="main">
 	<div class="row">
-		<div class="col-sm-6" config-editor spec="spec" hints="hints">
-			<div class="col-xs-8"></div>
-			<div class="col-xs-4">
-				<button class="btn btn-primary" ng-click="run()">Run</button>
+		<div class="col-sm-6">
+			<h1>Guillotine Cuts - Genetic Algorithm</h1>
+			<div class="row">
+			<div ng-show="apiErrors.length > 0" class="alert alert-warning alert-dismissible" 
+			role="alert">
+			<button type="button" class="close" ng-click="clearApiErrors()">
+				<span aria-hidden="true">&times;</span>
+				<span class="sr-only">Close</span>
+			</button>			
+				<p ng-repeat="error in apiErrors">{{error.message}}.</p>
+			</div>
+			</div>
+			<div config-editor spec="spec" , hints="hints"></div>
+			<div class="row pull-right">
+				<a class="btn btn-default"
+					href="http://github.com/rdarder/guillotine"> <span
+					class="glyphicon glyphicon-home"></span> About
+				</a>
+				<button class="btn btn-default" ng-click="resetHints()">
+					<span class="glyphicon glyphicon-refresh"></span> Default Config
+				</button>
+				<button class="btn btn-default" ng-click="random()">
+					<span class="glyphicon glyphicon-random"></span> Random
+				</button>
+				<button class="btn btn-primary" ng-click="run()">
+					<span class="glyphicon glyphicon-play"></span> Run
+				</button>
 			</div>
 		</div>
 		<div class="col-sm-6">
-			<div results-page results="results" style="text-align:center"></div>
+			<div results-page results="results" style="text-align: center"></div>
 		</div>
 	</div>
-</div>
 </div>
 
 <script type="text/ng-template" id="resultsPage.html">
@@ -33,11 +55,12 @@
 		</div>
 	</div>
 </div>
-<div class="row" ng-transclude></div>
+<br/>
 </script>
 
 <script type="text/ng-template" id="hintsEditor.html">
 <div class="row">
+	<div class="col-xs-12">
 	<form class="form-horizontal" role="form">
 		<div class="form-group">
 			<label class="col-sm-6 control-label">Population Size</label>
@@ -99,13 +122,13 @@
 			</div>
 		</div>
 	</form>
-
+</div>
 </div>
 </script>
 
 <script type="text/ng-template" id="specEditor.html">
 <div class="row">
-	<label class="col-xs-8"> <input type="checkbox"
+	<label class="col-xs-6"> <input type="checkbox"
 		ng-model="spec.limitedWidth"> Source Sheet has limited width.
 	</label>
 	<div class="col-xs-4">
@@ -113,7 +136,9 @@
 			ng-disabled="!spec.limitedWidth" placeholder="Max Width"
 			ng-model="spec.maxWidth">
 	</div>
+	<div class="col-xs-2"></div>
 </div>
+<br/>
 <div board-orders orders="spec.orders"></div>
 </script>
 
@@ -126,17 +151,12 @@
 	</div>
 	<div class="row" ng-repeat="order in orders">
 		<div board-order order="order">
-			<button ng-click="remove($index)" type="button"
-				class="btn btn-default">
+			<button ng-click="remove($index)" type="button" class="btn btn-default">
 				<span class="glyphicon glyphicon-remove"> </span>
 			</button>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-xs-4">
-			<button class="btn btn-default" ng-click="add()">
-				Add <span class="glyphicon glyphicon-plus"> </span>
-			</button>
+			<button ng-show="$last" class="btn btn-default" ng-click="add()">
+				<span class="glyphicon glyphicon-plus"> </span>
+			</button>			
 		</div>
 	</div>
 </form>

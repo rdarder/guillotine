@@ -10,6 +10,9 @@ import (
 	"net/http"
 	"time"
 )
+const (
+	gaTimeout = 10 * time.Second //Max time to spend per GeneticAlgorithm run.
+)
 
 // Greeting is a datastore entity that represents a single greeting.
 // It also serves as (a part of) a response of GreetingService.
@@ -191,7 +194,14 @@ func GetPlacements(lt *guillotine.LayoutTree) (sheet Board, bps []BoardPlacement
 		bp.Placement.X = drawing.Boxes[i].X
 		bp.Placement.Y = drawing.Boxes[i].Y
 	}
-	sheet = Board{drawing.Sheet.Width, drawing.Sheet.Height}
+	var width uint;
+	if lt.Spec.MaxWidth != 0 { 
+		// need to express limited/non-limited runs better, this spreads everywhere.
+		width = lt.Spec.MaxWidth
+	} else {
+		width = drawing.Sheet.Width
+	}
+	sheet = Board{width, drawing.Sheet.Height}
 	return sheet, bps
 }
 
@@ -205,7 +215,7 @@ func (gn *Guillotine) Cut(r *http.Request, msg *CutSpec, resp *CutResults) error
 	} else if ga, err := GetGeneticAlgorithm(cutSpec, *msg.Hints, gn.r); err != nil {
 		return err
 	} else {
-		generations, layout := ga.TimeBoundedRun(50 * time.Second)
+		generations, layout := ga.TimeBoundedRun(gaTimeout)
 		sheet, placements := GetPlacements(layout)
 		resp.Waste = sheet.Width*sheet.Height - cutSpec.TotalArea
 		resp.WastePercent = 100 * float64(resp.Waste) / float64(cutSpec.TotalArea)
@@ -219,13 +229,13 @@ func (gn *Guillotine) Cut(r *http.Request, msg *CutSpec, resp *CutResults) error
 func (gn *Guillotine) RandomSpec(r *http.Request, p *endpoints.VoidMessage, spec *CutSpec) error{
 
 	spec.MaxWidth = NormUint(200, 40, gn.r)
-	for i := NormUint(5, 3, gn.r) + 1; i > 0; i-- {
+	for i := NormUint(5, 3, gn.r) + 2; i > 0; i-- {
 		order := BoardOrder{
 			Amount: NormUint(1, 0.5, gn.r) + 1,
 			Board: Board{
 				// at least one dimension below maxWidth
-				Width:  NormUint(80, 40, gn.r) % spec.MaxWidth, 
-				Height: NormUint(100, 30, gn.r),
+				Width:  NormUint(80, 40, gn.r) % spec.MaxWidth + 1, 
+				Height: NormUint(100, 30, gn.r) + 1,
 			},
 		}
 		spec.Orders = append(spec.Orders, order)
